@@ -139,7 +139,9 @@ abstract class GherkinIntegrationTestRunner {
     Future<void> Function()? onBefore,
     Future<void> Function()? onAfter,
   }) {
-    if (_evaluateTagFilterExpression(configuration.tagExpression, tags)) {
+    if (_evaluateTagFilterExpression(configuration.tagExpression, tags) &&
+        _evaluatePreventTagFilterExpression(
+            configuration.preventTagExpression, tags)) {
       testWidgets(
         name,
         (WidgetTester tester) async {
@@ -437,5 +439,15 @@ abstract class GherkinIntegrationTestRunner {
     return tagExpression == null || tagExpression.isEmpty
         ? true
         : _tagExpressionEvaluator.evaluate(tagExpression, tags!.toList());
+  }
+
+  bool _evaluatePreventTagFilterExpression(
+    String? preventTagExpression,
+    Iterable<String>? tags,
+  ) {
+    return preventTagExpression == null || preventTagExpression.isEmpty
+        ? true
+        : !_tagExpressionEvaluator.evaluate(
+            preventTagExpression, tags!.toList());
   }
 }
